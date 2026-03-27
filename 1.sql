@@ -1,0 +1,35 @@
+CREATE TABLE `recording_document` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `title` varchar(512) DEFAULT NULL COMMENT '文章标题',
+  `content` json DEFAULT NULL COMMENT '原始内容',
+  `text_for_search` longtext DEFAULT NULL COMMENT '可检索文本（基于summary）',
+  `summary` text DEFAULT NULL COMMENT '摘要内容',
+  `embedding` VECTOR(1024) DEFAULT NULL COMMENT '文档向量',
+  `file_url` varchar(1024) DEFAULT NULL COMMENT '音频文件URL',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  FULLTEXT KEY `idx_fts` (`text_for_search`) WITH PARSER ik PARSER_PROPERTIES=(ik_mode="smart") BLOCK_SIZE 16384,
+  VECTOR KEY `idx_vec` (`embedding`) WITH (DISTANCE = L2,
+      TYPE = HNSW,
+      LIB = VSAG,
+      M = 16,
+      EF_CONSTRUCTION = 200,
+      EF_SEARCH = 64) BLOCK_SIZE 16384
+) ORGANIZATION INDEX AUTO_INCREMENT = 1 AUTO_INCREMENT_MODE = 'ORDER' DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMPRESSION = 'zstd_1.3.8' REPLICA_NUM = 1 BLOCK_SIZE = 16384 USE_BLOOM_FILTER = FALSE ENABLE_MACRO_BLOCK_BLOOM_FILTER = FALSE TABLET_SIZE = 134217728 PCTFREE = 0;
+
+CREATE TABLE `recording_paragraph` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `document_id` bigint(20) NOT NULL COMMENT '所属文档ID（recording_document.id）',
+  `paragraph_index` int(11) NOT NULL COMMENT '段落序号，从0开始',
+  `content` text DEFAULT NULL COMMENT '段落文本内容',
+  `embedding` VECTOR(1024) DEFAULT NULL COMMENT '段落向量',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_document` (`document_id`) BLOCK_SIZE 16384 LOCAL,
+  VECTOR KEY `idx_vec` (`embedding`) WITH (DISTANCE = L2,
+      TYPE = HNSW,
+      LIB = VSAG,
+      M = 16,
+      EF_CONSTRUCTION = 200,
+      EF_SEARCH = 64) BLOCK_SIZE 16384
+) ORGANIZATION INDEX AUTO_INCREMENT = 1 AUTO_INCREMENT_MODE = 'ORDER' DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMPRESSION = 'zstd_1.3.8' REPLICA_NUM = 1 BLOCK_SIZE = 16384 USE_BLOOM_FILTER = FALSE ENABLE_MACRO_BLOCK_BLOOM_FILTER = FALSE TABLET_SIZE = 134217728 PCTFREE = 0;
