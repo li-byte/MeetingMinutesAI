@@ -4,12 +4,14 @@ import subprocess
 from functools import wraps
 import warnings
 import gc
+from typing import Optional
 
 import torch
 import whisper
 import torchaudio
 from pyannote.audio import Pipeline
 from pyannote.core import Segment
+from whisper import Whisper
 
 warnings.filterwarnings("ignore", category=UserWarning, module="torchaudio._backend.utils")
 warnings.filterwarnings("ignore", category=UserWarning, module="speechbrain.utils.torch_audio_backend")
@@ -18,10 +20,9 @@ torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
 
 # 全局变量
-_pipeline = None
-_whisper_model = None
-_whisper_device = None
-
+_pipeline: Optional[Pipeline] = None
+_whisper_model: Optional[Whisper] = None
+_whisper_device: Optional[str] = None
 
 def timer():
     def decorator(func):
@@ -63,7 +64,7 @@ def initialize_models(model="small", config_path=None):
     print("模型加载完成！")
 
 
-def get_pipeline():
+def get_pipeline()->Pipeline:
     """获取 Pyannote pipeline 实例"""
     global _pipeline
     if _pipeline is None:
@@ -71,7 +72,7 @@ def get_pipeline():
     return _pipeline
 
 
-def get_whisper_model():
+def get_whisper_model()-> tuple[Whisper, str]:
     """获取 Whisper 模型实例"""
     global _whisper_model, _whisper_device
     if _whisper_model is None:
@@ -155,7 +156,7 @@ def get_speaker_for_time(start_time, end_time, diarization):
 
 
 @timer()
-def process_media(file_path: str, whisper_model="small") -> list:
+def process_media(file_path: str) -> list:
     """
     处理媒体文件，返回带说话人标签的转录结果
 

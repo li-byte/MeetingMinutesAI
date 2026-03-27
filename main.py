@@ -75,6 +75,8 @@ if __name__ == '__main__':
     end = time.time()
     print(f"数据库操作执行时间: {end - start:.2f} 秒")
 
+    print(data)
+
 
 
 
