@@ -1,9 +1,8 @@
-import json
 from typing import List, Dict
 
 from sql.dao.recording_document_dao import RecordingDAO
 from sql.db import DBSession
-from tool.analysis_tool import process_media
+from audioAnalysis.analysis_tool import process_media
 from tool.embedding import get_embedding
 from tool.large_model import summary_analysis
 
