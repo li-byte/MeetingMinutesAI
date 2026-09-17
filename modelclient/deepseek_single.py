@@ -12,7 +12,7 @@ class DeepSeekClient:
         self,
         base_url: str = "https://api.deepseek.com"
     ):
-        self.api_key = "sk-d66bc1b5da854fe889f72e544c9aa9e8"
+        self.api_key = "sk-"
         if not self.api_key:
             raise ValueError("请设置 DEEPSEEK_API_KEY 环境变量")
 
